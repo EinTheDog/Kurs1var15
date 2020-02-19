@@ -1,10 +1,10 @@
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
-import java.util.Map;
 
 public class TicTacToeField {
     private final int size;
-    private int maxLength = 0;
+    private  ArrayList<Comb> allCombs = new ArrayList<>();
     private Cell [][] field;
 
     public TicTacToeField (int size) {
@@ -35,6 +35,9 @@ public class TicTacToeField {
     //функция для добавления символа в клетку
     public void addSymbol (Symbol symbol, int x, int y) {
         field[y][x].setSymbol(symbol);
+        field[y][x].setComb(new Comb(CombType.HORIZONTAL), CombType.HORIZONTAL);
+        field[y][x].setComb(new Comb(CombType.VERTICAL), CombType.VERTICAL);
+        field[y][x].setComb(new Comb(CombType.DIAGONAL), CombType.DIAGONAL);
         //просматриваем всех соседей данной клетки
         for (Cell c: field[y][x].getNeighbours()) {
             //если символ соседней клетки совпадает с нашим символом
@@ -46,24 +49,48 @@ public class TicTacToeField {
                     if (y == c.getY()) { relativePos = CombType.VERTICAL; }
                     else relativePos = CombType.DIAGONAL;
                 }
-                if (c.getComb(relativePos) == null) {
-                    //если сосед не является частью непрерывной линии символов в данном измерении
-                    // создаем линию из 2ух элементов
-                    Comb newComb = new Comb(relativePos);
-                    c.setComb(newComb);
-                    field[x][y].setComb(newComb);
+                if (c.getComb(relativePos).getLength() < field[y][x].getComb(relativePos).getLength()) {
+                    //если линия клетки-соседа меньше, чем длина линии, в которую входим мы,
+                    //то увчеличимваем длину нашей линии на 1 и записываем в клетку-соседа нашу линию
+                    field[y][x].getComb(relativePos).addCell();
+                    allCombs.remove(c.getComb(relativePos));
+                    c.setComb(field[y][x].getComb(relativePos), relativePos);
                 } else {
-                    //иначе увеличиваем длину линии на 1 и записываем линию в нашу клетку
-                    Comb comb = c.getComb(relativePos);
-                    comb.addCell();
-                    //обновляем макимальную длинну непрерывной линии
-                    maxLength = comb.getLength() > maxLength? comb.getLength(): maxLength;
-                    field[x][y].setComb(comb);
+                    //иначе увеличиваем длину линии соседа на 1 и записываем линию в нашу клетку
+                    c.getComb(relativePos).addCell();
+                    allCombs.remove(field[y][x].getComb(relativePos));
+                    field[y][x].setComb(c.getComb(relativePos), relativePos);
                 }
+                allCombs.sort(Comparator.comparing(Comb::getLength));
             }
         }
 
     }
+
+    //функция для отчистки клетки
+    public void clearCell (int x, int y) {
+        Symbol symbol = field[y][x].getSymbol();
+        field[y][x].getComb(CombType.HORIZONTAL).removeCell();
+        if (field[y][x].getComb(CombType.HORIZONTAL).getLength() == 0){
+            allCombs.remove(field[y][x].getComb(CombType.HORIZONTAL));
+        }
+        field[y][x].getComb(CombType.VERTICAL).removeCell();
+        if (field[y][x].getComb(CombType.VERTICAL).getLength() == 0){
+            allCombs.remove(field[y][x].getComb(CombType.HORIZONTAL));
+        }
+        field[y][x].getComb(CombType.DIAGONAL).removeCell();
+        if (field[y][x].getComb(CombType.DIAGONAL).getLength() == 0){
+            allCombs.remove(field[y][x].getComb(CombType.HORIZONTAL));
+        }
+        field[y][x].setSymbol(Symbol._);
+        field[y][x].setComb(null, CombType.HORIZONTAL);
+        field[y][x].setComb(null, CombType.VERTICAL);
+        field[y][x].setComb(null, CombType.DIAGONAL);
+        allCombs.sort(Comparator.comparing(Comb::getLength));
+
+    }
+
+    //получение длиннейшей
 }
 
 class Cell {
@@ -87,9 +114,10 @@ class Cell {
     public void addNeighbour (Cell neighbour) {neighbours.add(neighbour);}
     public ArrayList<Cell> getNeighbours () { return neighbours;}
     public Comb getComb (CombType combType) {return combs.get(combType);}
-    public  void  setComb (Comb comb) {combs.put(comb.getType(), comb );}
+    public  void  setComb (Comb comb, CombType combType) {combs.put(combType, comb );}
     public Symbol getSymbol () { return symbol;}
     public void setSymbol (Symbol symbol) {this.symbol = symbol;}
+
 
 }
 
@@ -114,9 +142,10 @@ class Comb {
     private int length;
     public Comb (CombType combType) {
         type = combType;
-        length = 2;
+        length = 1;
     }
     public void addCell () { length++; }
+    public void removeCell () { length--; }
     public CombType getType () { return type; }
     public int getLength () { return length; }
 }

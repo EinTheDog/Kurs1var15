@@ -4,14 +4,11 @@ import java.util.Map;
 
 public class TicTacToeField {
     private final int size;
-    public TicTacToeField (int size) {
-        this.size = size;
-        this.init();
-    }
+    private int maxLength = 0;
     private Cell [][] field;
 
-    //инициализация поля
-    public void init () {
+    public TicTacToeField (int size) {
+        this.size = size;
         //создание матрицы для хранения клеток
         field = new Cell [size][size];
         for (int i = 0; i < size; i++) {
@@ -34,6 +31,39 @@ public class TicTacToeField {
             }
         }
     }
+
+    //функция для добавления символа в клетку
+    public void addSymbol (Symbol symbol, int x, int y) {
+        field[y][x].setSymbol(symbol);
+        //просматриваем всех соседей данной клетки
+        for (Cell c: field[y][x].getNeighbours()) {
+            //если символ соседней клетки совпадает с нашим символом
+            if (c.getSymbol() == symbol) {
+                //определяем взаимное расположение клеток
+                CombType relativePos;
+                if (x == c.getX()) { relativePos = CombType.HORIZONTAL; }
+                else {
+                    if (y == c.getY()) { relativePos = CombType.VERTICAL; }
+                    else relativePos = CombType.DIAGONAL;
+                }
+                if (c.getComb(relativePos) == null) {
+                    //если сосед не является частью непрерывной линии символов в данном измерении
+                    // создаем линию из 2ух элементов
+                    Comb newComb = new Comb(relativePos);
+                    c.setComb(newComb);
+                    field[x][y].setComb(newComb);
+                } else {
+                    //иначе увеличиваем длину линии на 1 и записываем линию в нашу клетку
+                    Comb comb = c.getComb(relativePos);
+                    comb.addCell();
+                    //обновляем макимальную длинну непрерывной линии
+                    maxLength = comb.getLength() > maxLength? comb.getLength(): maxLength;
+                    field[x][y].setComb(comb);
+                }
+            }
+        }
+
+    }
 }
 
 class Cell {
@@ -41,19 +71,25 @@ class Cell {
     private int x;
     private int y;
     private Symbol symbol;
-    private Comb [] combs = new Comb[3]; // массив для линий,
-    // в которых находится клетка 0 - гориз., 1 - верт., 2 - диаг.
+    private HashMap<CombType, Comb> combs = new HashMap<>();
     private ArrayList<Cell> neighbours = new ArrayList<>(); // список с соседями клетки
     public Cell (int x, int y, Symbol s) {
         this.x = x;
         this. y = y;
         symbol = s;
-
+        combs.put(CombType.HORIZONTAL, null);
+        combs.put(CombType.VERTICAL, null);
+        combs.put(CombType.DIAGONAL, null);
     }
 
     public int getX () { return x;}
     public int getY () { return y;}
     public void addNeighbour (Cell neighbour) {neighbours.add(neighbour);}
+    public ArrayList<Cell> getNeighbours () { return neighbours;}
+    public Comb getComb (CombType combType) {return combs.get(combType);}
+    public  void  setComb (Comb comb) {combs.put(comb.getType(), comb );}
+    public Symbol getSymbol () { return symbol;}
+    public void setSymbol (Symbol symbol) {this.symbol = symbol;}
 
 }
 
@@ -74,11 +110,18 @@ class Pair <T, U> {
 
 //класс для непрерывной линии
 class Comb {
-    private combType type;
+    private CombType type;
     private int length;
+    public Comb (CombType combType) {
+        type = combType;
+        length = 2;
+    }
+    public void addCell () { length++; }
+    public CombType getType () { return type; }
+    public int getLength () { return length; }
 }
 
 
 
 enum Symbol {X, O, _}
-enum combType {HORIZONTAL, VERTICAL, DIAGONAL}
+enum CombType {HORIZONTAL, VERTICAL, DIAGONAL}

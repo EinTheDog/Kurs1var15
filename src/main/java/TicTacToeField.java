@@ -13,7 +13,7 @@ public class TicTacToeField {
         field = new Cell [size][size];
         for (int i = 0; i < size; i++) {
             for (int j = 0; j <size; j++) {
-                field[i][j] = new Cell(j, i, Symbol._); // каждая клетка пока пустая
+                field[i][j] = new Cell(j, i, Symbol.NULL); // каждая клетка пока пустая
                 addNeighbours(field[i][j]);
             }
         }
@@ -24,9 +24,9 @@ public class TicTacToeField {
         int x = cell.getX();
         int y = cell.getY();
         for (int i = y - 1; i <= y + 1; i++) {
-            if (i < 0) continue;
+            if (i < 0 || i >= size) continue;
             for (int j = x - 1; j <= x + 1; j++) {
-                if (x < 0 || (i == y && j ==x)) continue;
+                if (j < 0 ||  j >= size || (i == y && j ==x)) continue;
                 cell.addNeighbour(field[i][j]);
             }
         }
@@ -37,9 +37,15 @@ public class TicTacToeField {
         field[y][x].setSymbol(symbol);
         field[y][x].setComb(new Comb(CombType.HORIZONTAL), CombType.HORIZONTAL);
         field[y][x].setComb(new Comb(CombType.VERTICAL), CombType.VERTICAL);
-        field[y][x].setComb(new Comb(CombType.DIAGONAL), CombType.DIAGONAL);
+        field[y][x].setComb(new Comb(CombType.DIAGONAL_UP), CombType.DIAGONAL_UP);
+        field[y][x].setComb(new Comb(CombType.DIAGONAL_DOWN), CombType.DIAGONAL_DOWN);
+        allCombs.add(field[y][x].getComb(CombType.HORIZONTAL));
+        allCombs.add(field[y][x].getComb(CombType.VERTICAL));
+        allCombs.add(field[y][x].getComb(CombType.DIAGONAL_UP));
+        allCombs.add(field[y][x].getComb(CombType.DIAGONAL_DOWN));
         //просматриваем всех соседей данной клетки
         for (Cell c: field[y][x].getNeighbours()) {
+            if (c == null) break;
             //если символ соседней клетки совпадает с нашим символом
             if (c.getSymbol() == symbol) {
                 //определяем взаимное расположение клеток
@@ -47,7 +53,13 @@ public class TicTacToeField {
                 if (x == c.getX()) { relativePos = CombType.HORIZONTAL; }
                 else {
                     if (y == c.getY()) { relativePos = CombType.VERTICAL; }
-                    else relativePos = CombType.DIAGONAL;
+                    else {
+                        if (x - c.getX() == y - c.getY()) {
+                            relativePos = CombType.DIAGONAL_UP;
+                        } else {
+                            relativePos = CombType.DIAGONAL_DOWN;
+                        }
+                    }
                 }
                 if (c.getComb(relativePos).getLength() < field[y][x].getComb(relativePos).getLength()) {
                     //если линия клетки-соседа меньше, чем длина линии, в которую входим мы,
@@ -61,10 +73,13 @@ public class TicTacToeField {
                     allCombs.remove(field[y][x].getComb(relativePos));
                     field[y][x].setComb(c.getComb(relativePos), relativePos);
                 }
-                allCombs.sort(Comparator.comparing(Comb::getLength));
             }
         }
-
+        Comb cmb1 = field[y][x].getComb(CombType.HORIZONTAL);
+        Comb cmb2 = field[y][x].getComb(CombType.DIAGONAL_DOWN);
+        Comb cmb3 = field[y][x].getComb(CombType.VERTICAL);
+        Comb cmb4 = field[y][x].getComb(CombType.DIAGONAL_UP);
+        int a = 0;
     }
 
     //функция для отчистки клетки
@@ -76,21 +91,34 @@ public class TicTacToeField {
         }
         field[y][x].getComb(CombType.VERTICAL).removeCell();
         if (field[y][x].getComb(CombType.VERTICAL).getLength() == 0){
-            allCombs.remove(field[y][x].getComb(CombType.HORIZONTAL));
+            allCombs.remove(field[y][x].getComb(CombType.VERTICAL));
         }
-        field[y][x].getComb(CombType.DIAGONAL).removeCell();
-        if (field[y][x].getComb(CombType.DIAGONAL).getLength() == 0){
-            allCombs.remove(field[y][x].getComb(CombType.HORIZONTAL));
+        field[y][x].getComb(CombType.DIAGONAL_UP).removeCell();
+        if (field[y][x].getComb(CombType.DIAGONAL_UP).getLength() == 0){
+            allCombs.remove(field[y][x].getComb(CombType.DIAGONAL_UP));
         }
-        field[y][x].setSymbol(Symbol._);
+        field[y][x].getComb(CombType.DIAGONAL_DOWN).removeCell();
+        if (field[y][x].getComb(CombType.DIAGONAL_DOWN).getLength() == 0){
+            allCombs.remove(field[y][x].getComb(CombType.DIAGONAL_DOWN));
+        }
+        field[y][x].setSymbol(Symbol.NULL);
         field[y][x].setComb(null, CombType.HORIZONTAL);
         field[y][x].setComb(null, CombType.VERTICAL);
-        field[y][x].setComb(null, CombType.DIAGONAL);
-        allCombs.sort(Comparator.comparing(Comb::getLength));
+        field[y][x].setComb(null, CombType.DIAGONAL_UP);
+        field[y][x].setComb(null, CombType.DIAGONAL_DOWN);
+
 
     }
 
-    //получение длиннейшей
+    //получение длиннейшей линии
+    public int getTheLongestComb () {
+        allCombs.sort(Comparator.comparing(Comb::getLength));
+        return allCombs.get(allCombs.size() - 1).getLength();
+    }
+
+    public Symbol getSymbol (int x, int y) {
+        return field[y][x].getSymbol();
+    }
 }
 
 class Cell {
@@ -106,7 +134,8 @@ class Cell {
         symbol = s;
         combs.put(CombType.HORIZONTAL, null);
         combs.put(CombType.VERTICAL, null);
-        combs.put(CombType.DIAGONAL, null);
+        combs.put(CombType.DIAGONAL_UP, null);
+        combs.put(CombType.DIAGONAL_DOWN, null);
     }
 
     public int getX () { return x;}
@@ -152,5 +181,5 @@ class Comb {
 
 
 
-enum Symbol {X, O, _}
-enum CombType {HORIZONTAL, VERTICAL, DIAGONAL}
+enum Symbol {X, O, NULL}
+enum CombType {HORIZONTAL, VERTICAL, DIAGONAL_UP, DIAGONAL_DOWN}

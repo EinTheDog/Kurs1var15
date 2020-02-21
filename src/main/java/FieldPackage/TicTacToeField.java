@@ -1,10 +1,12 @@
+package FieldPackage;
+
 import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.HashMap;
 
 public class TicTacToeField {
     private final int size;
-    private  ArrayList<Comb> allCombs = new ArrayList<>();
+    private  ArrayList<Comb> allXCombs = new ArrayList<>();
+    private  ArrayList<Comb> allOCombs = new ArrayList<>();
     private Cell [][] field;
 
     public TicTacToeField (int size) {
@@ -34,11 +36,13 @@ public class TicTacToeField {
 
     //функция для добавления символа в клетку
     public void addSymbol (Symbol symbol, int x, int y) {
+        ArrayList<Comb> allCombs;
+        if (symbol == Symbol.X) allCombs = allXCombs; else allCombs = allOCombs;
         field[y][x].setSymbol(symbol);
-        field[y][x].setComb(new Comb(CombType.HORIZONTAL), CombType.HORIZONTAL);
-        field[y][x].setComb(new Comb(CombType.VERTICAL), CombType.VERTICAL);
-        field[y][x].setComb(new Comb(CombType.DIAGONAL_UP), CombType.DIAGONAL_UP);
-        field[y][x].setComb(new Comb(CombType.DIAGONAL_DOWN), CombType.DIAGONAL_DOWN);
+        field[y][x].setComb(new Comb(CombType.HORIZONTAL, symbol), CombType.HORIZONTAL);
+        field[y][x].setComb(new Comb(CombType.VERTICAL, symbol), CombType.VERTICAL);
+        field[y][x].setComb(new Comb(CombType.DIAGONAL_UP, symbol), CombType.DIAGONAL_UP);
+        field[y][x].setComb(new Comb(CombType.DIAGONAL_DOWN, symbol), CombType.DIAGONAL_DOWN);
         allCombs.add(field[y][x].getComb(CombType.HORIZONTAL));
         allCombs.add(field[y][x].getComb(CombType.VERTICAL));
         allCombs.add(field[y][x].getComb(CombType.DIAGONAL_UP));
@@ -75,16 +79,13 @@ public class TicTacToeField {
                 }
             }
         }
-        Comb cmb1 = field[y][x].getComb(CombType.HORIZONTAL);
-        Comb cmb2 = field[y][x].getComb(CombType.DIAGONAL_DOWN);
-        Comb cmb3 = field[y][x].getComb(CombType.VERTICAL);
-        Comb cmb4 = field[y][x].getComb(CombType.DIAGONAL_UP);
-        int a = 0;
     }
 
     //функция для отчистки клетки
     public void clearCell (int x, int y) {
         Symbol symbol = field[y][x].getSymbol();
+        ArrayList<Comb> allCombs;
+        if (symbol == Symbol.X) allCombs = allXCombs; else allCombs = allOCombs;
         field[y][x].getComb(CombType.HORIZONTAL).removeCell();
         if (field[y][x].getComb(CombType.HORIZONTAL).getLength() == 0){
             allCombs.remove(field[y][x].getComb(CombType.HORIZONTAL));
@@ -111,11 +112,14 @@ public class TicTacToeField {
     }
 
     //получение длиннейшей линии
-    public int getTheLongestComb () {
+    public int getTheLongestComb (Symbol symbol) {
+        ArrayList<Comb> allCombs;
+        if (symbol == Symbol.X) allCombs = allXCombs; else allCombs = allOCombs;
         allCombs.sort(Comparator.comparing(Comb::getLength));
         return allCombs.get(allCombs.size() - 1).getLength();
     }
 
+    //
     public Symbol getSymbol (int x, int y) {
         return field[y][x].getSymbol();
     }

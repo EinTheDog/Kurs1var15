@@ -1,8 +1,10 @@
+package FieldPackage;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 
-public class Cell {
-
+class Cell {
+    //координаты клетки в массиве field
     private int x;
     private int y;
     private Symbol symbol;

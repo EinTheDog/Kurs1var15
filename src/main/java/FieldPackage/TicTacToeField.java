@@ -37,12 +37,16 @@ public class TicTacToeField {
     //функция для добавления символа в клетку
     public void addSymbol (Symbol symbol, int x, int y) {
         ArrayList<Comb> allCombs;
+        //определяем в список линий каких символов записывать изменения
         if (symbol == Symbol.X) allCombs = allXCombs; else allCombs = allOCombs;
+        //задаем символ клетки
         field[y][x].setSymbol(symbol);
+        //задаем начальные линии для клетки длиной 1
         field[y][x].setComb(new Comb(CombType.HORIZONTAL, symbol), CombType.HORIZONTAL);
         field[y][x].setComb(new Comb(CombType.VERTICAL, symbol), CombType.VERTICAL);
         field[y][x].setComb(new Comb(CombType.DIAGONAL_UP, symbol), CombType.DIAGONAL_UP);
         field[y][x].setComb(new Comb(CombType.DIAGONAL_DOWN, symbol), CombType.DIAGONAL_DOWN);
+        //добавляем эти линии в список всех линий данного символа
         allCombs.add(field[y][x].getComb(CombType.HORIZONTAL));
         allCombs.add(field[y][x].getComb(CombType.VERTICAL));
         allCombs.add(field[y][x].getComb(CombType.DIAGONAL_UP));
@@ -66,8 +70,9 @@ public class TicTacToeField {
                     }
                 }
                 if (c.getComb(relativePos).getLength() < field[y][x].getComb(relativePos).getLength()) {
-                    //если линия клетки-соседа меньше, чем длина линии, в которую входим мы,
+                    //если линия, частью которой является клетка-соседа меньше, чем длина линии, в которую входим мы,
                     //то увчеличимваем длину нашей линии на 1 и записываем в клетку-соседа нашу линию
+                    // (удаляем неиспользуемую линию из списка всех линий)
                     field[y][x].getComb(relativePos).addCell();
                     allCombs.remove(c.getComb(relativePos));
                     c.setComb(field[y][x].getComb(relativePos), relativePos);
@@ -85,8 +90,11 @@ public class TicTacToeField {
     public void clearCell (int x, int y) {
         Symbol symbol = field[y][x].getSymbol();
         ArrayList<Comb> allCombs;
+        //определяем в список линий каких символов записывать изменения
         if (symbol == Symbol.X) allCombs = allXCombs; else allCombs = allOCombs;
+        //вызываем функцию удаления клетки из линии (уменьшение ее длины на 1)
         field[y][x].getComb(CombType.HORIZONTAL).removeCell();
+        //если длина линии стала равна 0 - удаляем эту линию из списка
         if (field[y][x].getComb(CombType.HORIZONTAL).getLength() == 0){
             allCombs.remove(field[y][x].getComb(CombType.HORIZONTAL));
         }
@@ -102,7 +110,9 @@ public class TicTacToeField {
         if (field[y][x].getComb(CombType.DIAGONAL_DOWN).getLength() == 0){
             allCombs.remove(field[y][x].getComb(CombType.DIAGONAL_DOWN));
         }
+        //записываем в клетку знак пустоты
         field[y][x].setSymbol(Symbol.NULL);
+        //опусташаем линии, которые хранились в клетке
         field[y][x].setComb(null, CombType.HORIZONTAL);
         field[y][x].setComb(null, CombType.VERTICAL);
         field[y][x].setComb(null, CombType.DIAGONAL_UP);
@@ -115,11 +125,13 @@ public class TicTacToeField {
     public int getTheLongestComb (Symbol symbol) {
         ArrayList<Comb> allCombs;
         if (symbol == Symbol.X) allCombs = allXCombs; else allCombs = allOCombs;
+        //сортируем нужный списко непрерывных линий символов по длине
         allCombs.sort(Comparator.comparing(Comb::getLength));
-        return allCombs.get(allCombs.size() - 1).getLength();
+        //забираем последний элемент списка (с самой большой длиной) или возвращаем 0, если список пуст
+        return allCombs.size() > 0? allCombs.get(allCombs.size() - 1).getLength(): 0;
     }
 
-    //
+    //метод для получения символа клетки (нужен для тестирования)
     public Symbol getSymbol (int x, int y) {
         return field[y][x].getSymbol();
     }

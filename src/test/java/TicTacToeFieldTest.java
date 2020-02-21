@@ -49,6 +49,11 @@ class TicTacToeFieldTest {
         tField.addSymbol(Symbol.O, 2, 0);
         assertEquals(4, tField.getTheLongestComb(Symbol.O));
 
+        tField = new TicTacToeField(100);
+        tField.addSymbol(Symbol.X, 0, 0);
+        assertEquals(1, tField.getTheLongestComb(Symbol.X));
+        assertEquals(0, tField.getTheLongestComb(Symbol.O));
+
 
     }
 }

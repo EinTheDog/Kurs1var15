@@ -121,65 +121,8 @@ public class TicTacToeField {
     }
 }
 
-class Cell {
-
-    private int x;
-    private int y;
-    private Symbol symbol;
-    private HashMap<CombType, Comb> combs = new HashMap<>();
-    private ArrayList<Cell> neighbours = new ArrayList<>(); // список с соседями клетки
-    public Cell (int x, int y, Symbol s) {
-        this.x = x;
-        this. y = y;
-        symbol = s;
-        combs.put(CombType.HORIZONTAL, null);
-        combs.put(CombType.VERTICAL, null);
-        combs.put(CombType.DIAGONAL_UP, null);
-        combs.put(CombType.DIAGONAL_DOWN, null);
-    }
-
-    public int getX () { return x;}
-    public int getY () { return y;}
-    public void addNeighbour (Cell neighbour) {neighbours.add(neighbour);}
-    public ArrayList<Cell> getNeighbours () { return neighbours;}
-    public Comb getComb (CombType combType) {return combs.get(combType);}
-    public  void  setComb (Comb comb, CombType combType) {combs.put(combType, comb );}
-    public Symbol getSymbol () { return symbol;}
-    public void setSymbol (Symbol symbol) {this.symbol = symbol;}
-
-
-}
-
-
-//класс для пар
-class Pair <T, U> {
-    private T first;
-    private U second;
-    public Pair (T first, U second) {
-        this.first = first;
-        this.second = second;
-    }
-    public T getFirst () {return first;}
-    public U getSecond() {return second;}
-    public void setFirst(T first) { this.first = first;}
-    public void setSecond(U second) { this.second = second;}
-}
-
-//класс для непрерывной линии
-class Comb {
-    private CombType type;
-    private int length;
-    public Comb (CombType combType) {
-        type = combType;
-        length = 1;
-    }
-    public void addCell () { length++; }
-    public void removeCell () { length--; }
-    public CombType getType () { return type; }
-    public int getLength () { return length; }
-}
 
 
 
-enum Symbol {X, O, NULL}
-enum CombType {HORIZONTAL, VERTICAL, DIAGONAL_UP, DIAGONAL_DOWN}
+
+

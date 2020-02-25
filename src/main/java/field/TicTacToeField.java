@@ -1,18 +1,19 @@
-package FieldPackage;
+package field;
 
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.List;
 
 public class TicTacToeField {
     private final int size;
-    private  ArrayList<Comb> allXCombs = new ArrayList<>();
-    private  ArrayList<Comb> allOCombs = new ArrayList<>();
-    private Cell [][] field;
+    private  List<Comb> allXCombs = new ArrayList<>();
+    private  List<Comb> allOCombs = new ArrayList<>();
+    private Cell[][] field;
 
     public TicTacToeField (int size) {
         this.size = size;
         //создание матрицы для хранения клеток
-        field = new Cell [size][size];
+        field = new Cell[size][size];
         for (int i = 0; i < size; i++) {
             for (int j = 0; j <size; j++) {
                 field[i][j] = new Cell(j, i, Symbol.NULL); // каждая клетка пока пустая
@@ -36,7 +37,11 @@ public class TicTacToeField {
 
     //функция для добавления символа в клетку
     public void addSymbol (Symbol symbol, int x, int y) {
-        ArrayList<Comb> allCombs;
+        //проверка на заполненность клетки
+        if (field[y][x].getSymbol() != Symbol.NULL) {
+            return;
+        }
+        List<Comb> allCombs;
         //определяем в список линий каких символов записывать изменения
         if (symbol == Symbol.X) allCombs = allXCombs; else allCombs = allOCombs;
         //задаем символ клетки
@@ -88,8 +93,12 @@ public class TicTacToeField {
 
     //функция для отчистки клетки
     public void clearCell (int x, int y) {
+        //Проверка на заполненность клетки
+        if (field[y][x].getSymbol() == Symbol.NULL) {
+            return;
+        }
         Symbol symbol = field[y][x].getSymbol();
-        ArrayList<Comb> allCombs;
+        List<Comb> allCombs;
         //определяем в список линий каких символов записывать изменения
         if (symbol == Symbol.X) allCombs = allXCombs; else allCombs = allOCombs;
         //вызываем функцию удаления клетки из линии (уменьшение ее длины на 1)
@@ -123,7 +132,7 @@ public class TicTacToeField {
 
     //получение длиннейшей линии
     public int getTheLongestComb (Symbol symbol) {
-        ArrayList<Comb> allCombs;
+        List<Comb> allCombs;
         if (symbol == Symbol.X) allCombs = allXCombs; else allCombs = allOCombs;
         //сортируем нужный списко непрерывных линий символов по длине
         allCombs.sort(Comparator.comparing(Comb::getLength));

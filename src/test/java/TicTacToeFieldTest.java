@@ -1,5 +1,5 @@
-import FieldPackage.Symbol;
-import FieldPackage.TicTacToeField;
+import field.Symbol;
+import field.TicTacToeField;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;

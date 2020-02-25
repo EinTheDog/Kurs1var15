@@ -1,4 +1,5 @@
-package FieldPackage;
+package field;
+
 //класс для непрерывной линии символов
 class Comb {
     //все параметры

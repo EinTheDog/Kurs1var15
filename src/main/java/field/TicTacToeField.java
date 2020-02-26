@@ -11,16 +11,26 @@ public class TicTacToeField {
     private Cell[][] field;
 
     public TicTacToeField (int size) {
+        if (size < 0) throw new IllegalArgumentException();
         this.size = size;
         //создание матрицы для хранения клеток
         field = new Cell[size][size];
         for (int i = 0; i < size; i++) {
             for (int j = 0; j <size; j++) {
                 field[i][j] = new Cell(j, i, Symbol.NULL); // каждая клетка пока пустая
+            }
+        }
+        //добавим в каждую клетку информацию о ее соседях
+        for (int i = 0; i < size; i++) {
+            for (int j = 0; j <size; j++) {
                 addNeighbours(field[i][j]);
             }
         }
     }
+
+    //методы get для переопределения equals
+    private int getSize () { return size; }
+    private Cell getCell (int x, int y) { return field[y][x];}
 
     //добавление всех соседей клетки
     private void addNeighbours (Cell cell) {
@@ -36,29 +46,27 @@ public class TicTacToeField {
     }
 
     //функция для добавления символа в клетку
-    public void addSymbol (Symbol symbol, int x, int y) {
+    public Result addSymbol (Symbol symbol, int x, int y) {
+        if (x >= size || y >= size || x < 0 || y < 0) throw new IllegalArgumentException();
         //проверка на заполненность клетки
-        if (field[y][x].getSymbol() != Symbol.NULL) {
-            return;
-        }
+        if (field[y][x].getSymbol() != Symbol.NULL) return Result.FAIL;
+        //проверка на попытку добавить пустоту
+        if (symbol == Symbol.NULL) return Result.FAIL;
         List<Comb> allCombs;
         //определяем в список линий каких символов записывать изменения
-        if (symbol == Symbol.X) allCombs = allXCombs; else allCombs = allOCombs;
+        allCombs = symbol == Symbol.X? allXCombs: allOCombs;
         //задаем символ клетки
         field[y][x].setSymbol(symbol);
         //задаем начальные линии для клетки длиной 1
-        field[y][x].setComb(new Comb(CombType.HORIZONTAL, symbol), CombType.HORIZONTAL);
-        field[y][x].setComb(new Comb(CombType.VERTICAL, symbol), CombType.VERTICAL);
-        field[y][x].setComb(new Comb(CombType.DIAGONAL_UP, symbol), CombType.DIAGONAL_UP);
-        field[y][x].setComb(new Comb(CombType.DIAGONAL_DOWN, symbol), CombType.DIAGONAL_DOWN);
+        for (CombType combType: CombType.values()) {
+            field[y][x].setComb(new Comb(combType, symbol), combType);
+        }
         //добавляем эти линии в список всех линий данного символа
-        allCombs.add(field[y][x].getComb(CombType.HORIZONTAL));
-        allCombs.add(field[y][x].getComb(CombType.VERTICAL));
-        allCombs.add(field[y][x].getComb(CombType.DIAGONAL_UP));
-        allCombs.add(field[y][x].getComb(CombType.DIAGONAL_DOWN));
+        for (CombType combType: CombType.values()) {
+            allCombs.add(field[y][x].getComb(combType));
+        }
         //просматриваем всех соседей данной клетки
         for (Cell c: field[y][x].getNeighbours()) {
-            if (c == null) break;
             //если символ соседней клетки совпадает с нашим символом
             if (c.getSymbol() == symbol) {
                 //определяем взаимное расположение клеток
@@ -67,11 +75,7 @@ public class TicTacToeField {
                 else {
                     if (y == c.getY()) { relativePos = CombType.VERTICAL; }
                     else {
-                        if (x - c.getX() == y - c.getY()) {
-                            relativePos = CombType.DIAGONAL_UP;
-                        } else {
-                            relativePos = CombType.DIAGONAL_DOWN;
-                        }
+                        relativePos = (x - c.getX() == y - c.getY())?CombType.DIAGONAL_UP: CombType.DIAGONAL_DOWN;
                     }
                 }
                 if (c.getComb(relativePos).getLength() < field[y][x].getComb(relativePos).getLength()) {
@@ -89,45 +93,39 @@ public class TicTacToeField {
                 }
             }
         }
+        return Result.SUCCESS;
     }
 
     //функция для отчистки клетки
-    public void clearCell (int x, int y) {
+    public Result clearCell (int x, int y) {
+        if (x >= size || y >= size || x < 0 || y < 0) throw new IllegalArgumentException();
         //Проверка на заполненность клетки
         if (field[y][x].getSymbol() == Symbol.NULL) {
-            return;
+            return Result.FAIL;
         }
         Symbol symbol = field[y][x].getSymbol();
         List<Comb> allCombs;
         //определяем в список линий каких символов записывать изменения
-        if (symbol == Symbol.X) allCombs = allXCombs; else allCombs = allOCombs;
-        //вызываем функцию удаления клетки из линии (уменьшение ее длины на 1)
-        field[y][x].getComb(CombType.HORIZONTAL).removeCell();
-        //если длина линии стала равна 0 - удаляем эту линию из списка
-        if (field[y][x].getComb(CombType.HORIZONTAL).getLength() == 0){
-            allCombs.remove(field[y][x].getComb(CombType.HORIZONTAL));
-        }
-        field[y][x].getComb(CombType.VERTICAL).removeCell();
-        if (field[y][x].getComb(CombType.VERTICAL).getLength() == 0){
-            allCombs.remove(field[y][x].getComb(CombType.VERTICAL));
-        }
-        field[y][x].getComb(CombType.DIAGONAL_UP).removeCell();
-        if (field[y][x].getComb(CombType.DIAGONAL_UP).getLength() == 0){
-            allCombs.remove(field[y][x].getComb(CombType.DIAGONAL_UP));
-        }
-        field[y][x].getComb(CombType.DIAGONAL_DOWN).removeCell();
-        if (field[y][x].getComb(CombType.DIAGONAL_DOWN).getLength() == 0){
-            allCombs.remove(field[y][x].getComb(CombType.DIAGONAL_DOWN));
+        allCombs = symbol == Symbol.X? allXCombs: allOCombs;
+        //удаляем клетку из всех линий, в которых она состояла
+        for (CombType combType:CombType.values()) {
+            removeCellFromComb(allCombs, field[y][x].getComb(combType));
         }
         //записываем в клетку знак пустоты
         field[y][x].setSymbol(Symbol.NULL);
         //опусташаем линии, которые хранились в клетке
-        field[y][x].setComb(null, CombType.HORIZONTAL);
-        field[y][x].setComb(null, CombType.VERTICAL);
-        field[y][x].setComb(null, CombType.DIAGONAL_UP);
-        field[y][x].setComb(null, CombType.DIAGONAL_DOWN);
+        for (CombType combType:CombType.values()) {
+            field[y][x].setComb(null, combType);
+        }
+        return Result.SUCCESS;
+    }
 
-
+    //метод для удаления клетки из линии
+    private void removeCellFromComb (List<Comb> allCombs, Comb comb) {
+        //вызываем функцию удаления клетки из линии (уменьшение ее длины на 1)
+        comb.removeCell();
+        //если длина линии стала равна 0 - удаляем эту линию из списка
+        if (comb.getLength() == 0) allCombs.remove(comb);
     }
 
     //получение длиннейшей линии
@@ -143,6 +141,52 @@ public class TicTacToeField {
     //метод для получения символа клетки (нужен для тестирования)
     public Symbol getSymbol (int x, int y) {
         return field[y][x].getSymbol();
+    }
+
+    //переопределения
+    @Override
+    public int hashCode () {
+        int code = 0;
+        for (int i = 0; i < size; i++) {
+            for (int j = 0; j <size; j++) {
+                switch (field[i][j].getSymbol()) {
+                    case O: code += (10 * i + j) * (size + 10); break;
+                    case X: code += (10 * i + j) * (size + 20); break;
+                    default: code += (10 * i + j) * (size + 30); break;
+                }
+            }
+        }
+        return code;
+    }
+
+    @Override
+    public boolean equals (Object o) {
+        if (o == this) return true;
+        if (o instanceof TicTacToeField) {
+            TicTacToeField field = (TicTacToeField) o;
+            if (field.getSize() == getSize()) {
+                for (int i = 0; i < getSize(); i ++) {
+                    for (int j = 0; j < getSize(); j++) {
+                        if (!(field.getCell(i, j).equals(this.getCell(i, j)))) return false;
+                    }
+                }
+                return true;
+            }
+        }
+        return false;
+    }
+
+    @Override
+    public String toString () {
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < size; i ++) {
+            for (int j = 0; j < size; j++) {
+                sb.append(field[i][j].toString());
+            }
+            sb.append('\n');
+        }
+        sb.delete(size*(size + 1) - 1, size*(size + 1));
+        return sb.toString();
     }
 }
 

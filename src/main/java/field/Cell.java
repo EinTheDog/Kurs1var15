@@ -40,4 +40,29 @@ class Cell {
     //get и set для символа
     public Symbol getSymbol () { return symbol;}
     public void setSymbol (Symbol symbol) {this.symbol = symbol;}
+
+    //Переопределения
+    @Override
+    public int hashCode () {
+        return x + 113 * y + symbol.hashCode();
+    }
+
+    @Override
+    public boolean equals (Object o) {
+        if (o == this) return true;
+        if (o instanceof Cell) {
+            Cell c = (Cell) o;
+            return c.getX() == getX() && c.getY() == getY() && c.getSymbol() == getSymbol();
+        }
+        return false;
+    }
+
+    @Override
+    public String toString () {
+        switch (getSymbol()) {
+            case O: return "O";
+            case X: return "X";
+            default: return "_";
+        }
+    }
 }

@@ -26,6 +26,7 @@ class Cell {
         combs.put(CombType.DIAGONAL_UP, null);
         combs.put(CombType.DIAGONAL_DOWN, null);
     }
+    //test
 
     //методы для получения координат клетки
     public int getX () { return x;}

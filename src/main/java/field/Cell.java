@@ -41,7 +41,7 @@ class Cell {
     public Symbol getSymbol () { return symbol;}
     public void setSymbol (Symbol symbol) {this.symbol = symbol;}
 
-    //Переопределения
+    //Переопределения методов
     @Override
     public int hashCode () {
         return x + 31 * y + symbol.hashCode();

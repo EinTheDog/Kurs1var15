@@ -26,7 +26,6 @@ class Cell {
         combs.put(CombType.DIAGONAL_UP, null);
         combs.put(CombType.DIAGONAL_DOWN, null);
     }
-    //test2
 
     //методы для получения координат клетки
     public int getX () { return x;}
@@ -45,7 +44,7 @@ class Cell {
     //Переопределения
     @Override
     public int hashCode () {
-        return x + 113 * y + symbol.hashCode();
+        return x + 31 * y + symbol.hashCode();
     }
 
     @Override

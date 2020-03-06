@@ -138,7 +138,7 @@ public class TicTacToeField {
         return allCombs.size() > 0? allCombs.get(allCombs.size() - 1).getLength(): 0;
     }
 
-    //метод для получения символа клетки (нужен для тестирования)
+    //метод для получения символа клетки (нужен для проведения тестов)
     public Symbol getSymbol (int x, int y) {
         return field[y][x].getSymbol();
     }

@@ -132,7 +132,7 @@ public class TicTacToeField {
     public int getTheLongestComb (Symbol symbol) {
         List<Comb> allCombs;
         if (symbol == Symbol.X) allCombs = allXCombs; else allCombs = allOCombs;
-        //сортируем нужный списко непрерывных линий символов по длине
+        //сортируем нужный список непрерывных линий символов по длине
         allCombs.sort(Comparator.comparing(Comb::getLength));
         //забираем последний элемент списка (с самой большой длиной) или возвращаем 0, если список пуст
         return allCombs.size() > 0? allCombs.get(allCombs.size() - 1).getLength(): 0;
@@ -146,28 +146,24 @@ public class TicTacToeField {
     //переопределения
     @Override
     public int hashCode () {
-        int code = 0;
+        int result = 17;
         for (int i = 0; i < size; i++) {
             for (int j = 0; j <size; j++) {
-                switch (field[i][j].getSymbol()) {
-                    case O: code += (10 * i + j) * (size + 10); break;
-                    case X: code += (10 * i + j) * (size + 20); break;
-                    default: code += (10 * i + j) * (size + 30); break;
-                }
+                result = result * 31 + field[i][j].hashCode();
             }
         }
-        return code;
+        return result;
     }
 
     @Override
     public boolean equals (Object o) {
         if (o == this) return true;
         if (o instanceof TicTacToeField) {
-            TicTacToeField field = (TicTacToeField) o;
-            if (field.getSize() == getSize()) {
+            TicTacToeField fieldO = (TicTacToeField) o;
+            if (fieldO.getSize() == getSize()) {
                 for (int i = 0; i < getSize(); i ++) {
                     for (int j = 0; j < getSize(); j++) {
-                        if (!(field.getCell(i, j).equals(this.getCell(i, j)))) return false;
+                        if (!(fieldO.getCell(i, j).equals(this.getCell(i, j)))) return false;
                     }
                 }
                 return true;
@@ -185,6 +181,7 @@ public class TicTacToeField {
             }
             sb.append('\n');
         }
+        //удаляем последний лишний абзац
         sb.delete(size*(size + 1) - 1, size*(size + 1));
         return sb.toString();
     }

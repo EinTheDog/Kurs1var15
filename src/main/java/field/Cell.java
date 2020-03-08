@@ -35,7 +35,7 @@ class Cell {
     public List<Cell> getNeighbours () { return neighbours;}
     //метод для получения непрерывной линии заданного типа, проходящей через эту клетку
     public Comb getComb (CombType combType) {return combs.get(combType);}
-    //метод для замены линии, которая проходит через данную клетку
+    //метод для замены линии, которая проходит через данную клетку (линию можно заменитьь на null)
     public  void  setComb (Comb comb, CombType combType) {combs.put(combType, comb );}
     //get и set для символа
     public Symbol getSymbol () { return symbol;}
@@ -44,7 +44,11 @@ class Cell {
     //Переопределения методов
     @Override
     public int hashCode () {
-        return x + 31 * y + symbol.hashCode();
+        int result = 17;
+        result = result * 31 + x;
+        result = result * 31 + y;
+        result = result * 31 + symbol.hashCode();
+        return result;
     }
 
     @Override

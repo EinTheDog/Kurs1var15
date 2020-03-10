@@ -211,14 +211,16 @@ public class TicTacToeField {
     @Override
     public String toString () {
         StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < size; i ++) {
+        for (int i = 0; i < size - 1; i ++) {
             for (int j = 0; j < size; j++) {
                 sb.append(field[i][j].toString());
             }
             sb.append(System.lineSeparator());
         }
+        for (int j = 0; j < size; j++) {
+            sb.append(field[size - 1][j].toString());
+        }
         //удаляем последний лишний абзац
-        sb.delete(size*(size + 1) - 1, size*(size + 1));
         return sb.toString();
     }
 }

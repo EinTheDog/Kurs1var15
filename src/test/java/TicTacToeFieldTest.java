@@ -108,4 +108,46 @@ class TicTacToeFieldTest {
         assertEquals(4, tField.getTheLongestComb(Symbol.O));
     }
 
+    @Test
+    void fieldEquals () {
+        TicTacToeField tField1 = new TicTacToeField(4);
+        TicTacToeField tField2 = new TicTacToeField(4);
+        for (int i = 0; i < 4; i++) {
+            tField1.addSymbol(Symbol.O, i, 1);
+            tField2.addSymbol(Symbol.O, i, 1);
+        }
+        assertTrue(tField1.equals(tField2));
+        assertTrue(tField2.equals(tField1));
+
+        tField1 = new TicTacToeField(6);
+        tField2 = new TicTacToeField(6);
+        for (int i = 0; i < 4; i++) {
+            tField1.addSymbol(Symbol.O, i, 1);
+            tField2.addSymbol(Symbol.X, i, 1);
+        }
+        assertFalse(tField1.equals(tField2));
+        assertFalse(tField2.equals(tField1));
+
+        tField1 = new TicTacToeField(4);
+        tField2 = new TicTacToeField(6);
+        for (int i = 0; i < 4; i++) {
+            tField1.addSymbol(Symbol.X, i, 1);
+            tField2.addSymbol(Symbol.X, i, 1);
+        }
+        assertFalse(tField1.equals(tField2));
+        assertFalse(tField2.equals(tField1));
+
+        assertFalse(tField1.equals("hello"));
+    }
+
+    @Test
+    void fieldToString () {
+        TicTacToeField tField = new TicTacToeField(4);
+        tField.addSymbol(Symbol.X, 3, 0);
+        for (int i = 0; i < 4; i++) {
+            tField.addSymbol(Symbol.O, i, 1);
+        }
+        assertEquals("___X\r\nOOOO\r\n____\r\n____", tField.toString());
+    }
+
 }

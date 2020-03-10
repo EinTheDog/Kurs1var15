@@ -6,6 +6,12 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 class TicTacToeFieldTest {
+    @Test
+    void getSymbol() {
+        //Попытка ввести некорреткные координаты для взятия символа
+        TicTacToeField tField = new TicTacToeField(3);
+        assertThrows(IllegalArgumentException.class, () -> tField.getSymbol(-2, -0));
+    }
 
     @Test
     void addSymbol() {

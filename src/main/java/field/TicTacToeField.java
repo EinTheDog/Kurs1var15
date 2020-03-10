@@ -140,6 +140,7 @@ public class TicTacToeField {
 
     //метод для получения символа клетки (нужен для проведения тестов)
     public Symbol getSymbol (int x, int y) {
+        if (x >= size || y >= size || x < 0 || y < 0) throw new IllegalArgumentException();
         return field[y][x].getSymbol();
     }
 
@@ -179,7 +180,7 @@ public class TicTacToeField {
             for (int j = 0; j < size; j++) {
                 sb.append(field[i][j].toString());
             }
-            sb.append('\n');
+            sb.append(System.lineSeparator());
         }
         //удаляем последний лишний абзац
         sb.delete(size*(size + 1) - 1, size*(size + 1));

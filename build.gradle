@@ -18,7 +18,10 @@ test {
 }
 
 apply plugin: 'java'
-task myJavadocs(type: Javadoc) {
+
+javadoc {
     source = sourceSets.main.allJava
+    classpath = configurations.compile
 }
+
 

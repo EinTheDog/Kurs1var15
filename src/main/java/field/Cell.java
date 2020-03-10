@@ -30,18 +30,35 @@ class Cell {
     //методы для получения координат клетки
     public int getX () { return x;}
     public int getY () { return y;}
-    //методы для добавления соседей и получения списка соседей клетки
+
+    /**
+     * метод для добавления соседа клетки
+     * @param neighbour клетка, которую мы добавляем в список соседей данной клетки
+     */
     public void addNeighbour (Cell neighbour) {neighbours.add(neighbour);}
+
+    /**
+     * @return возвращает список (ArrayList) соседей клетки
+     */
     public List<Cell> getNeighbours () { return neighbours;}
-    //метод для получения непрерывной линии заданного типа, проходящей через эту клетку
+
+    /**
+     * метод для получения непрерывной линии заданного типа, проходящей через эту клетку
+     * @param combType тип непрерывной линии (по горизонатали, вертикали и т.д.)
+     * @return возвращает линию класса Comb
+     */
     public Comb getComb (CombType combType) {return combs.get(combType);}
-    //метод для замены линии, которая проходит через данную клетку (линию можно заменитьь на null)
+
+    /**
+     * метод для замены линии, которая проходит через данную клетку
+     * @param comb линия, на которую мы заменяем линию, лежащую в данной клетке
+     * @param combType тип заменяем линии (нужен, так как comb может быть равен null)
+     */
     public  void  setComb (Comb comb, CombType combType) {combs.put(combType, comb );}
     //get и set для символа
     public Symbol getSymbol () { return symbol;}
     public void setSymbol (Symbol symbol) {this.symbol = symbol;}
 
-    //Переопределения методов
     @Override
     public int hashCode () {
         int result = 17;

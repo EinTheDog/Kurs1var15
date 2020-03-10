@@ -4,6 +4,10 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
+/**
+ * @author Maxim Alpatski
+ * @version 1.0
+ */
 public class TicTacToeField {
     private final int size;
     private  List<Comb> allXCombs = new ArrayList<>();
@@ -32,7 +36,11 @@ public class TicTacToeField {
     private int getSize () { return size; }
     private Cell getCell (int x, int y) { return field[y][x];}
 
-    //добавление всех соседей клетки
+    /**
+     * добавление всех соседей клетки
+     * @param cell клетка, для которой мы указываем соседей
+     */
+
     private void addNeighbours (Cell cell) {
         int x = cell.getX();
         int y = cell.getY();
@@ -45,7 +53,14 @@ public class TicTacToeField {
         }
     }
 
-    //функция для добавления символа в клетку
+    /**
+     * метод для добавления символа в клетку
+     * @param symbol добавляемый символ (крестик или нолик)
+     * @param x координата клетки по горизонтали
+     * @param y координата клетки по вертикали
+     * @return возвращает TRUE, если метод был выполнен успешно и FALSE,
+     * если возникли проблемы (попытка добавить пустоту или добавить символ в непустую клетку)
+     */
     public Result addSymbol (Symbol symbol, int x, int y) {
         if (x >= size || y >= size || x < 0 || y < 0) throw new IllegalArgumentException();
         //проверка на заполненность клетки
@@ -96,7 +111,13 @@ public class TicTacToeField {
         return Result.SUCCESS;
     }
 
-    //функция для отчистки клетки
+    /**
+     * метод для удаления символа из клетки
+     * @param x координата клетки по горизонтали
+     * @param y координата клетки по вертикали
+     * @return возвращает TRUE, если метод был выполнен успешно и FALSE,
+     * если возникли проблемы (попытка отчистить пустую клетку)
+     */
     public Result clearCell (int x, int y) {
         if (x >= size || y >= size || x < 0 || y < 0) throw new IllegalArgumentException();
         //Проверка на заполненность клетки
@@ -120,7 +141,13 @@ public class TicTacToeField {
         return Result.SUCCESS;
     }
 
-    //метод для удаления клетки из линии
+
+    /**
+     * метод для удаления клетки из линии
+     * @param allCombs  список линий, из которых нужно будет удалить линию, если она состояла
+     *                  из одного символа (список линий крестиков или линий ноликов)
+     * @param comb линия, из которой нужно удалить символ
+     */
     private void removeCellFromComb (List<Comb> allCombs, Comb comb) {
         //вызываем функцию удаления клетки из линии (уменьшение ее длины на 1)
         comb.removeCell();
@@ -128,7 +155,11 @@ public class TicTacToeField {
         if (comb.getLength() == 0) allCombs.remove(comb);
     }
 
-    //получение длиннейшей линии
+    /**
+     * метод для получения длиннейшей линии
+     * @param symbol определяет длиннейшую линию каких символов мы хотим получить (крстиков или ноликов)
+     * @return возвращает целое число - кол-во символов в длиннейшей линии
+     */
     public int getTheLongestComb (Symbol symbol) {
         List<Comb> allCombs;
         if (symbol == Symbol.X) allCombs = allXCombs; else allCombs = allOCombs;
@@ -138,13 +169,15 @@ public class TicTacToeField {
         return allCombs.size() > 0? allCombs.get(allCombs.size() - 1).getLength(): 0;
     }
 
-    //метод для получения символа клетки (нужен для проведения тестов)
+    /**
+     * метод для получения символа клетки (нужен для проведения тестов)
+     * @return возвращает символ из клетки, координаты которой мы задали
+     */
     public Symbol getSymbol (int x, int y) {
         if (x >= size || y >= size || x < 0 || y < 0) throw new IllegalArgumentException();
         return field[y][x].getSymbol();
     }
 
-    //переопределения
     @Override
     public int hashCode () {
         int result = 17;

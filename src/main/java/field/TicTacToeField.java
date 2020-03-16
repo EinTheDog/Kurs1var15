@@ -1,6 +1,5 @@
 package field;
 
-import java.nio.file.FileSystem;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -75,7 +74,7 @@ public class TicTacToeField {
         field[y][x].setSymbol(symbol);
         //задаем начальные линии для клетки длиной 1
         for (CombType combType: CombType.values()) {
-            field[y][x].setComb(new Comb(combType, symbol), combType);
+            field[y][x].setComb(new Comb(combType, field[y][x]), combType);
         }
         //добавляем эти линии в список всех линий данного символа
         for (CombType combType: CombType.values()) {
@@ -87,26 +86,45 @@ public class TicTacToeField {
             if (c.getSymbol() == symbol) {
                 //определяем взаимное расположение клеток
                 CombType relativePos;
-                if (x == c.getX()) { relativePos = CombType.HORIZONTAL; }
+                if (x == c.getX()) { relativePos = CombType.VERTICAL; }
                 else {
-                    if (y == c.getY()) { relativePos = CombType.VERTICAL; }
+                    if (y == c.getY()) { relativePos = CombType.HORIZONTAL; }
                     else {
-                        relativePos = (x - c.getX() == y - c.getY())?CombType.DIAGONAL_UP: CombType.DIAGONAL_DOWN;
+                        relativePos = (x - c.getX() == y - c.getY())?CombType.DIAGONAL_DOWN: CombType.DIAGONAL_UP;
                     }
                 }
-                if (c.getComb(relativePos).getLength() < field[y][x].getComb(relativePos).getLength()) {
-                    //если линия, частью которой является клетка-соседа меньше, чем длина линии, в которую входим мы,
-                    //то увчеличимваем длину нашей линии на 1 и записываем в клетку-соседа нашу линию
-                    // (удаляем неиспользуемую линию из списка всех линий)
-                    field[y][x].getComb(relativePos).addCell();
-                    allCombs.remove(c.getComb(relativePos));
-                    c.setComb(field[y][x].getComb(relativePos), relativePos);
+                //далее мы будем прибавлять линию правой (верхней) клетки к линии левой (нижней) клетки
+                Cell ltCell, rbCell;
+                if (relativePos == CombType.HORIZONTAL) {
+                    if (x < c.getX()){
+                        ltCell = field[y][x];
+                        rbCell = c;
+                    } else {
+                        ltCell = c;
+                        rbCell = field[y][x];
+                    }
                 } else {
-                    //иначе увеличиваем длину линии соседа на 1 и записываем линию в нашу клетку
-                    c.getComb(relativePos).addCell();
-                    allCombs.remove(field[y][x].getComb(relativePos));
-                    field[y][x].setComb(c.getComb(relativePos), relativePos);
+                    if (relativePos == CombType.VERTICAL) {
+                        if (y < c.getY()){
+                            ltCell = field[y][x];
+                            rbCell = c;
+                        } else {
+                            ltCell = c;
+                            rbCell = field[y][x];
+                        }
+                    } else {
+                        if (x < c.getX()){
+                            ltCell = field[y][x];
+                            rbCell = c;
+                        } else {
+                            ltCell = c;
+                            rbCell = field[y][x];
+                        }
+                    }
                 }
+                ltCell.getComb(relativePos).addComb(rbCell.getComb(relativePos));
+                allCombs.remove(rbCell.getComb(relativePos));
+                rbCell.setComb(ltCell.getComb(relativePos), relativePos);
             }
         }
         return Result.SUCCESS;
@@ -125,13 +143,9 @@ public class TicTacToeField {
         if (field[y][x].getSymbol() == Symbol.NULL) {
             return Result.FAIL;
         }
-        Symbol symbol = field[y][x].getSymbol();
-        List<Comb> allCombs;
-        //определяем в список линий каких символов записывать изменения
-        allCombs = symbol == Symbol.X? allXCombs: allOCombs;
         //удаляем клетку из всех линий, в которых она состояла
         for (CombType combType:CombType.values()) {
-            removeCellFromComb(allCombs, field[y][x].getComb(combType));
+            removeCellFromComb(field[y][x], combType);
         }
         //записываем в клетку знак пустоты
         field[y][x].setSymbol(Symbol.NULL);
@@ -145,15 +159,18 @@ public class TicTacToeField {
 
     /**
      * метод для удаления клетки из линии
-     * @param allCombs  список линий, из которых нужно будет удалить линию, если она состояла
-     *                  из одного символа (список линий крестиков или линий ноликов)
-     * @param comb линия, из которой нужно удалить символ
+     * @param cell клетка, из которой нужно удалить символ
+     * @param combType тип линии, из которой мы удаляем клетку
      */
-    private void removeCellFromComb (List<Comb> allCombs, Comb comb) {
-        //вызываем функцию удаления клетки из линии (уменьшение ее длины на 1)
-        comb.removeCell();
-        //если длина линии стала равна 0 - удаляем эту линию из списка
-        if (comb.getLength() == 0) allCombs.remove(comb);
+    private void removeCellFromComb (Cell cell, CombType combType) {
+        Comb comb = cell.getComb(combType);
+        List <Comb> allCombs = comb.getSymbol() == Symbol.X? allXCombs: allOCombs;
+        Pair<Comb> combPair = comb.removeCell(cell);
+        //удаляем старую линию из списка и добавляем две новообразованные
+        // (если удаляемая клетка была крайней, то пустую линию не добавляем)
+        allCombs.remove(comb);
+        if (combPair.first != null) allCombs.add(combPair.first);
+        if (combPair.second != null) allCombs.add(combPair.second);
     }
 
     /**

@@ -67,17 +67,21 @@ class TicTacToeFieldTest {
 
         tField = new TicTacToeField(1000);
         assertEquals(0, tField.getTheLongestComb(Symbol.X));
+
+        tField = new TicTacToeField(5);
+        tField.addSymbol(Symbol.X, 0, 0);
+        tField.addSymbol(Symbol.X, 1, 0);
+        tField.addSymbol(Symbol.X, 3, 0);
+        tField.addSymbol(Symbol.X, 4, 0);
+        tField.addSymbol(Symbol.X, 2, 0);
+        assertEquals(5, tField.getTheLongestComb(Symbol.X));
+        tField.clearCell(1, 0);
+        assertEquals(3, tField.getTheLongestComb(Symbol.X));
     }
 
     @Test
     void getTheLongestOComb() {
         TicTacToeField tField = new TicTacToeField(4);
-        tField.addSymbol(Symbol.X, 3, 0);
-        tField.addSymbol(Symbol.X, 1, 0);
-        tField.addSymbol(Symbol.X, 2, 1);
-        tField.addSymbol(Symbol.X, 1, 2);
-        tField.addSymbol(Symbol.X, 2, 2);
-        tField.addSymbol(Symbol.X, 2, 3);
         tField.addSymbol(Symbol.O, 0, 0);
         tField.addSymbol(Symbol.O, 0, 1);
         tField.addSymbol(Symbol.O, 0, 2);
@@ -85,6 +89,12 @@ class TicTacToeFieldTest {
         tField.addSymbol(Symbol.O, 2, 0);
         tField.addSymbol(Symbol.O, 1, 3);
         tField.addSymbol(Symbol.O, 2, 0);
+        tField.addSymbol(Symbol.X, 3, 0);
+        tField.addSymbol(Symbol.X, 1, 0);
+        tField.addSymbol(Symbol.X, 2, 1);
+        tField.addSymbol(Symbol.X, 1, 2);
+        tField.addSymbol(Symbol.X, 2, 2);
+        tField.addSymbol(Symbol.X, 2, 3);
         assertEquals(4, tField.getTheLongestComb(Symbol.O));
 
         tField = new TicTacToeField(1000);
@@ -107,9 +117,8 @@ class TicTacToeFieldTest {
         tField.addSymbol(Symbol.X, 0, 0);
         tField.addSymbol(Symbol.X, 1, 1);
         tField.addSymbol(Symbol.X, 2, 2);
-        System.out.println(tField.getTheLongestComb(Symbol.X));
         tField.clearCell(1,1);
-        System.out.println(tField.getTheLongestComb(Symbol.X));
+        assertEquals(1, tField.getTheLongestComb(Symbol.X));
     }
 
     @Test

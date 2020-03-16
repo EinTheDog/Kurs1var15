@@ -6,12 +6,6 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 class TicTacToeFieldTest {
-    @Test
-    void getSymbol() {
-        //Попытка ввести некорреткные координаты для взятия символа
-        TicTacToeField tField = new TicTacToeField(3);
-        assertThrows(IllegalArgumentException.class, () -> tField.getSymbol(-2, -0));
-    }
 
     @Test
     void addSymbol() {
@@ -29,12 +23,6 @@ class TicTacToeFieldTest {
         tField = new TicTacToeField(20);
         assertEquals(Result.FAIL, tField.addSymbol(Symbol.NULL, 2, 0));
 
-        //Попытка задать некорректные координаты клетки
-        final TicTacToeField finalField1 = new TicTacToeField(1);
-        assertThrows(IllegalArgumentException.class, () -> finalField1.addSymbol(Symbol.X, 1, 0));
-
-        //Попытка задать полю некорректный размер
-        assertThrows(IllegalArgumentException.class, () -> new TicTacToeField(-2));
     }
 
     @Test
@@ -48,9 +36,19 @@ class TicTacToeFieldTest {
         tField = new TicTacToeField(2);
         assertEquals(Result.FAIL, tField.clearCell(1, 0));
 
+
+    }
+
+    @Test
+    void testForWrongArguments() {
         //Попытка задать некорректные координаты клетки
         final TicTacToeField finalField1 = new TicTacToeField(1);
         assertThrows(IllegalArgumentException.class, () -> finalField1.clearCell(1, 0));
+        assertThrows(IllegalArgumentException.class, () -> finalField1.addSymbol(Symbol.X, 1, 0));
+        assertThrows(IllegalArgumentException.class, () -> finalField1.getSymbol(-2, -0));
+
+        //Попытка задать полю некорректный размер
+        assertThrows(IllegalArgumentException.class, () -> new TicTacToeField(-2));
     }
 
     @Test
@@ -116,8 +114,8 @@ class TicTacToeFieldTest {
             tField1.addSymbol(Symbol.O, i, 1);
             tField2.addSymbol(Symbol.O, i, 1);
         }
-        assertTrue(tField1.equals(tField2));
-        assertTrue(tField2.equals(tField1));
+        assertEquals(tField1, tField2);
+        assertEquals(tField2, tField1);
 
         tField1 = new TicTacToeField(6);
         tField2 = new TicTacToeField(6);
@@ -125,8 +123,8 @@ class TicTacToeFieldTest {
             tField1.addSymbol(Symbol.O, i, 1);
             tField2.addSymbol(Symbol.X, i, 1);
         }
-        assertFalse(tField1.equals(tField2));
-        assertFalse(tField2.equals(tField1));
+        assertNotEquals(tField1, tField2);
+        assertNotEquals(tField2, tField1);
 
         tField1 = new TicTacToeField(4);
         tField2 = new TicTacToeField(6);
@@ -134,10 +132,10 @@ class TicTacToeFieldTest {
             tField1.addSymbol(Symbol.X, i, 1);
             tField2.addSymbol(Symbol.X, i, 1);
         }
-        assertFalse(tField1.equals(tField2));
-        assertFalse(tField2.equals(tField1));
+        assertNotEquals(tField1, tField2);
+        assertNotEquals(tField2, tField1);
 
-        assertFalse(tField1.equals("hello"));
+        assertNotEquals("hello", tField1);
     }
 
     @Test
@@ -147,7 +145,11 @@ class TicTacToeFieldTest {
         for (int i = 0; i < 4; i++) {
             tField.addSymbol(Symbol.O, i, 1);
         }
-        assertEquals("___X\r\nOOOO\r\n____\r\n____", tField.toString());
+        String answer = "___X" + System.lineSeparator()
+                      + "OOOO" + System.lineSeparator()
+                      + "____" + System.lineSeparator()
+                      + "____";
+        assertEquals(answer, tField.toString());
     }
 
 }

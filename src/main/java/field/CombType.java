@@ -1,6 +1,6 @@
 package field;
 
-public enum CombType {
+enum CombType {
     HORIZONTAL,
     VERTICAL,
     DIAGONAL_UP,

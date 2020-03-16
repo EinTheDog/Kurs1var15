@@ -38,9 +38,9 @@ class Cell {
     public void addNeighbour (Cell neighbour) {neighbours.add(neighbour);}
 
     /**
-     * @return возвращает список (ArrayList) соседей клетки
+     * @return возвращает список-копию (ArrayList) соседей клетки
      */
-    public List<Cell> getNeighbours () { return neighbours;}
+    public List<Cell> getNeighbours () { return List.copyOf(neighbours);}
 
     /**
      * метод для получения непрерывной линии заданного типа, проходящей через эту клетку

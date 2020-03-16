@@ -35,8 +35,6 @@ class TicTacToeFieldTest {
         //Попытка отчистить пустую клетку
         tField = new TicTacToeField(2);
         assertEquals(Result.FAIL, tField.clearCell(1, 0));
-
-
     }
 
     @Test
@@ -104,6 +102,14 @@ class TicTacToeFieldTest {
         tField.addSymbol(Symbol.O, 3, 3);
         tField.addSymbol(Symbol.O, 2, 2);
         assertEquals(4, tField.getTheLongestComb(Symbol.O));
+
+        tField = new TicTacToeField(3);
+        tField.addSymbol(Symbol.X, 0, 0);
+        tField.addSymbol(Symbol.X, 1, 1);
+        tField.addSymbol(Symbol.X, 2, 2);
+        System.out.println(tField.getTheLongestComb(Symbol.X));
+        tField.clearCell(1,1);
+        System.out.println(tField.getTheLongestComb(Symbol.X));
     }
 
     @Test

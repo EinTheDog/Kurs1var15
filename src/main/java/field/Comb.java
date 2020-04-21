@@ -27,7 +27,7 @@ class Comb {
     }
 
     private Comb subComb (int ind1, int ind2) {
-        if (ind1 >= list.size()) return null;
+        if (ind1 == ind2) return null;
         Comb newComb = new Comb(type, list.get(ind1));
         for (int i = ind1 + 1; i < ind2 && i < list.size(); i++) newComb.addCell(list.get(i));
         return newComb;
@@ -41,9 +41,7 @@ class Comb {
      */
     public Pair<Comb> removeCell (Cell cell) {
         int ind = list.indexOf(cell);
-        Supplier<Comb> s1 = () -> this.subComb(0, ind);
-        Supplier<Comb> s2 = () -> this.subComb(ind + 1, list.size());
-        return new Pair<>(s1 , s2);
+        return new Pair<>(this.subComb(0, ind), this.subComb(ind + 1, list.size()) );
     }
 
 
